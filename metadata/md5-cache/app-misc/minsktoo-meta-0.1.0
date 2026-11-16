@@ -1,0 +1,9 @@
+DEFINED_PHASES=-
+DESCRIPTION=Meta package for the minsktoo Gentoo overlay
+EAPI=8
+HOMEPAGE=https://codeberg.org{R}
+KEYWORDS=~amd64 ~arm64
+LICENSE=metapackage
+RDEPEND=app-misc/minsktoocfg app-portage/minsktoo-scripts sys-config/minsktoo-configs sys-kernel/minsktoo-kernel-config
+SLOT=0
+_md5_=78804f529a2687f801f13c9c048990e1

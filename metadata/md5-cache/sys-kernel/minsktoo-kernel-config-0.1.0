@@ -1,0 +1,8 @@
+DEFINED_PHASES=-
+DESCRIPTION=Placeholder minsktoo package (minsktoo-kernel-config) awaiting target build
+EAPI=8
+HOMEPAGE=https://codeberg.org{R}
+KEYWORDS=~amd64 ~arm64
+LICENSE=MIT
+SLOT=0
+_md5_=a3df8fac8c5f5ce1f9a7533c00acb7d6

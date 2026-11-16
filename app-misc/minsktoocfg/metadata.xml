@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE pkgmetadata SYSTEM "https://gentoo.org">
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
 <pkgmetadata>
 	<maintainer type="person">
 		<email>andiallen1979@protonmail.com</email>
 		<name>J. Allen</name>
 	</maintainer>
+	<use>
+		<flag name="gtk3">Build and install the native GTK3 graphical interface (minsktoocfg-gtk3)</flag>
+		<flag name="gtk4">Build and install the native GTK4 graphical interface (minsktoocfg-gtk4)</flag>
+		<flag name="qt6">Build and install the native PyQt6 graphical interface (minsktoocfg-qt6)</flag>
+	</use>
 	<upstream>
 		<remote-id type="codeberg">andiallen1979/minsktoo</remote-id>
 	</upstream>
