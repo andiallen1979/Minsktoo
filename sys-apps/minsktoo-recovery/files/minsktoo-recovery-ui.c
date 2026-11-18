@@ -19,7 +19,8 @@
 #define C_OK      0xFFA78BFA
 #define C_ERR     0xFFF87171
 
-static uint32_t *fb;
+static uint32_t *fb, *buf;
+static int dirty = 1;
 static int w = 1080, h = 2400, stride = 1080;
 static char status_line[128] = "READY - ONLY ED25519 SIGNED IMAGES ACCEPTED";
 static char files[32][128];
@@ -73,7 +74,7 @@ static void fill_rect(int x, int y, int rw, int rh, uint32_t col) {
     for (int py = y; py < y + rh && py < h; py++)
         if (py >= 0)
             for (int px = x; px < x + rw && px < w; px++)
-                if (px >= 0) fb[py * stride + px] = col;
+                if (px >= 0) buf[py * stride + px] = col;
 }
 
 static void draw_text(int x, int y, const char *s, uint32_t col, int sc) {
@@ -159,6 +160,7 @@ static void render(void) {
     fill_rect(48, h - 220, w - 96, 160, C_CARD);
     fill_rect(48, h - 220, w - 96, 4, C_SILVER);
     draw_text(72, h - 165, status_line, C_SILVER, 2);
+    memcpy(fb, buf, (size_t)h * stride * 4);
 }
 
 int main(void) {
@@ -170,6 +172,7 @@ int main(void) {
     ioctl(fbfd, FBIOGET_FSCREENINFO, &finfo);
     w = vinfo.xres; h = vinfo.yres; stride = finfo.line_length / 4;
     fb = mmap(NULL, finfo.smem_len, PROT_READ | PROT_WRITE, MAP_SHARED, fbfd, 0);
+    buf = malloc((size_t)h * stride * 4);
 
     int evfd = -1;
     for (int i = 0; i < 8; i++) {
@@ -180,9 +183,10 @@ int main(void) {
 
     int ty = 0;
     for (;;) {
-        render();
+        if (dirty) { render(); dirty = 0; }
         struct input_event ev;
         if (evfd >= 0 && read(evfd, &ev, sizeof(ev)) == sizeof(ev)) {
+            dirty = 1;
             if (ev.type == EV_ABS && ev.code == ABS_MT_POSITION_Y) ty = ev.value;
             if ((ev.type == EV_KEY && ev.code == BTN_TOUCH && ev.value == 0) ||
                 (ev.type == EV_KEY && ev.code == KEY_POWER && ev.value == 1)) {
