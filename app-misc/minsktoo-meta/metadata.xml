@@ -1,15 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pkgmetadata SYSTEM "https://gentoo.org">
 <pkgmetadata>
-	<maintainer type="person">
-		<email>andiallen1979@users.noreply.github.com</email>
-		<name>J. Allen</name>
-	</maintainer>
 	<use>
-		<flag name="bootcfg">Install sys-boot/gentool-bootcfg</flag>
 		<flag name="conf">Install sys-config/minsktoo-configs</flag>
+		<flag name="hub">Install app-portage/fragtoo-hub</flag>
 		<flag name="kconf">Install sys-kernel/minsktoo-kernel-config</flag>
-		<flag name="menu">Install app-misc/gentool-menu</flag>
-		<flag name="scripts">Install app-portage/gentool-scripts</flag>
+		<flag name="mkernel">Install sys-kernel/minsktoo-kernel (arm64 sm6150 dist-kernel)</flag>
 	</use>
 </pkgmetadata>
