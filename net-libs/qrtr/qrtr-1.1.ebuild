@@ -8,5 +8,4 @@ SLOT="0"
 KEYWORDS="~arm64"
 src_install() {
 	meson_src_install
-	systemd_dounit qrtr-ns.service
 }
