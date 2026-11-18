@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+PUB="${MINSKTOO_PUB_KEY:-/etc/minsktoo/keys/public.pem}"
+IMG="${1:?Usage: minsktoo-recover <signed-image> <boot_a|boot_b|dtbo_a|dtbo_b|userdata>}"
+TARGET="${2:?Specify target partition}"
+
+case "${TARGET}" in
+  boot_a|boot_b|dtbo_a|dtbo_b|userdata) ;;
+  *) echo "REFUSED: '${TARGET}' is not on the safe partition allowlist."; exit 1 ;;
+esac
+
+[ -f "${PUB}" ] && [ -f "${IMG}" ] && [ -f "${IMG}.sig" ] || { echo "REFUSED: Missing key, image, or .sig"; exit 1; }
+
+openssl pkeyutl -verify -pubin -inkey "${PUB}" -rawin -in "${IMG}" -sigfile "${IMG}.sig" >/dev/null 2>&1 || {
+  echo "SECURITY ALERT: Ed25519 signature verification FAILED for ${IMG}."
+  exit 1
+}
+
+DEV="/dev/disk/by-partlabel/${TARGET}"
+[ -b "${DEV}" ] || DEV="/dev/block/by-name/${TARGET}"
+[ -b "${DEV}" ] || { echo "Block device for ${TARGET} not found."; exit 1; }
+
+dd if="${IMG}" of="${DEV}" bs=4M conv=fsync status=progress
+sync

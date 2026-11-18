@@ -8,6 +8,7 @@
 		<flag name="kconf">Install sys-kernel/minsktoo-kernel-config</flag>
 		<flag name="mkernel">Install sys-kernel/minsktoo-kernel (arm64 sm6150 dist-kernel)</flag>
 		<flag name="plasma">Install KDE Plasma Wayland desktop and PipeWire audio</flag>
+		<flag name="recovery">Install sys-apps/minsktoo-recovery signed recovery tool</flag>
 		<flag name="radios">Install Qualcomm QRTR/QMI modem, Wi-Fi, and Bluetooth daemons</flag>
 	</use>
 </pkgmetadata>

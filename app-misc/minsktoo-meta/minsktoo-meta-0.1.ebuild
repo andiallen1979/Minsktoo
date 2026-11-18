@@ -4,7 +4,7 @@ HOMEPAGE="https://fragtoo.com"
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~arm64"
-IUSE="+conf +fw +hub +kconf +mkernel +plasma +radios"
+IUSE="+conf +fw +hub +kconf +mkernel +plasma +radios +recovery"
 RDEPEND="
 	conf? ( sys-config/minsktoo-configs )
 	hub? ( app-portage/fragtoo-hub )
@@ -16,6 +16,7 @@ RDEPEND="
 		media-video/wireplumber
 	)
 	fw? ( sys-apps/minsktoo-firmware-extract )
+	recovery? ( sys-apps/minsktoo-recovery )
 	radios? (
 		net-libs/libqmi
 		net-libs/qrtr

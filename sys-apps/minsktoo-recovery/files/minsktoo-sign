@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+KEY_DIR="${MINSKTOO_KEY_DIR:-/etc/minsktoo/keys}"
+PRIV="${KEY_DIR}/private.pem"
+PUB="${KEY_DIR}/public.pem"
+
+case "${1}" in
+  keygen)
+    mkdir -p "${KEY_DIR}" && chmod 700 "${KEY_DIR}"
+    openssl genpkey -algorithm Ed25519 -out "${PRIV}" && chmod 600 "${PRIV}"
+    openssl pkey -in "${PRIV}" -pubout -out "${PUB}" && chmod 644 "${PUB}"
+    echo "Generated Ed25519 keys in ${KEY_DIR}"
+    ;;
+  sign)
+    IMG="${2:?Usage: minsktoo-sign sign <image-file>}"
+    [ -f "${PRIV}" ] && [ -f "${IMG}" ] || { echo "Missing key or image"; exit 1; }
+    openssl pkeyutl -sign -inkey "${PRIV}" -rawin -in "${IMG}" -out "${IMG}.sig"
+    sha256sum "${IMG}" > "${IMG}.sha256"
+    echo "Signed ${IMG} -> ${IMG}.sig"
+    ;;
+  *)
+    echo "Usage: minsktoo-sign <keygen|sign <image-file>>"
+    exit 1
+    ;;
+esac
