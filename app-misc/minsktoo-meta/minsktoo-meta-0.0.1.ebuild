@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 EAPI=8
 DESCRIPTION="Meta-package for minsktoo Motorola arm64 Plasma Mobile configuration and utilities"
-HOMEPAGE="https://codeberg.org"
+HOMEPAGE="https://fragtoo.com"
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="arm64 ~arm64 ~amd64"
