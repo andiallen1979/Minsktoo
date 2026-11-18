@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+SLOT=$(sed -n 's/.*androidboot\.slot_suffix=\(_[ab]\).*/\1/p' /proc/cmdline)
+[ -z "${SLOT}" ] && SLOT="_a"
+
+MNT_BASE="/run/minsktoo-fw"
+FW_DST="/lib/firmware/qcom/sm6150"
+mkdir -p "${MNT_BASE}/modem" "${MNT_BASE}/dsp" "${MNT_BASE}/bluetooth" "${FW_DST}"
+
+for part in modem dsp bluetooth; do
+	DEV="/dev/disk/by-partlabel/${part}${SLOT}"
+	[ -b "${DEV}" ] || DEV="/dev/block/by-name/${part}${SLOT}"
+	if [ -b "${DEV}" ] && ! mountpoint -q "${MNT_BASE}/${part}"; then
+		mount -o ro,nosuid,nodev,noexec "${DEV}" "${MNT_BASE}/${part}" || true
+	fi
+done
+
+find "${MNT_BASE}" -maxdepth 3 -type f \( \
+	-name "*.mbn" -o -name "*.mdt" -o -name "*.b[0-9][0-9]" -o \
+	-name "*.tlv" -o -name "*.bin" -o -name "*.qdb" -o -name "*.jsn" \
+\) -exec ln -sf {} "${FW_DST}/" \;

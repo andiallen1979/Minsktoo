@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+import os, struct, sys
+
+if len(sys.argv) < 3:
+    print("Usage: minsktoo-mkbootimg <Image.gz-dtb> <out-boot.img> [initrd.cpio.gz]")
+    sys.exit(1)
+
+kernel = open(sys.argv[1], "rb").read()
+ramdisk = open(sys.argv[3], "rb").read() if len(sys.argv) > 3 and os.path.exists(sys.argv[3]) else b""
+page = 4096
+cmdline = b"console=ttyMSM0,115200n8 earlycon clk_ignore_unused pd_ignore_unused"
+
+def pad(b):
+    rem = len(b) % page
+    return b + (b"\x00" * (page - rem) if rem else b"")
+
+hdr = struct.pack(
+    "<8s10I16s512s32s1024s",
+    b"ANDROID!",
+    len(kernel), 0x00008000,
+    len(ramdisk), 0x01000000,
+    0, 0x00f00000,
+    0x00000100, page,
+    0, 0,
+    b"minsktoo",
+    cmdline[:512],
+    b"\x00" * 32,
+    b""
+)
+open(sys.argv[2], "wb").write(pad(hdr) + pad(kernel) + pad(ramdisk))
+print(f"Wrote {sys.argv[2]} ({os.path.getsize(sys.argv[2])} bytes)")

@@ -3,6 +3,7 @@
 <pkgmetadata>
 	<use>
 		<flag name="conf">Install sys-config/minsktoo-configs</flag>
+		<flag name="fw">Install sys-apps/minsktoo-firmware-extract</flag>
 		<flag name="hub">Install app-portage/fragtoo-hub</flag>
 		<flag name="kconf">Install sys-kernel/minsktoo-kernel-config</flag>
 		<flag name="mkernel">Install sys-kernel/minsktoo-kernel (arm64 sm6150 dist-kernel)</flag>

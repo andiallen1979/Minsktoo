@@ -1,0 +1,13 @@
+[Unit]
+Description=Mount Motorola minsk A/B modem/dsp/bluetooth partitions and link QCOM firmware
+DefaultDependencies=no
+After=systemd-udevd.service local-fs-pre.target
+Before=local-fs.target qrtr-ns.service pd-mapper.service rmtfs.service ModemManager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/minsktoo-firmware-sync
+
+[Install]
+WantedBy=sysinit.target
