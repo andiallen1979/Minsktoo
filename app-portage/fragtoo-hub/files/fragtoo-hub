@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import json, os, shutil, subprocess, sys, urllib.parse, urllib.request
+
+INDEX_URL = os.environ.get("FRAGTOO_HUB_URL", "https://fragtoo.com" + "/overlays.json")
+
+def fetch_overlays():
+    req = urllib.request.Request(INDEX_URL, headers={"User-Agent": "fragtoo-hub/0.1"})
+    with urllib.request.urlopen(req, timeout=15) as r:
+        return json.loads(r.read().decode()).get("overlays", [])
+
+def cmd_list(term=""):
+    for o in fetch_overlays():
+        blob = f"{o['name']} {o.get('description','')} {o.get('owner','')}".lower()
+        if term.lower() in blob:
+            print(f"{o['name']:<16} [{o.get('sync_type','git')}] {o['sync_uri']}\n    {o.get('description','')}")
+
+def cmd_add(name, sync=True):
+    if os.geteuid() != 0:
+        sys.exit("Error: 'add' requires root privileges (run with sudo).")
+    match = next((o for o in fetch_overlays() if o["name"].lower() == name.lower()), None)
+    if not match:
+        sys.exit(f"Overlay '{name}' not found in {INDEX_URL}")
+    rname, stype, suri = match["name"], match.get("sync_type", "git"), match["sync_uri"]
+    if shutil.which("eselect"):
+        subprocess.run(["eselect", "repository", "add", rname, stype, suri], check=True)
+    else:
+        os.makedirs("/etc/portage/repos.conf", exist_ok=True)
+        with open(f"/etc/portage/repos.conf/{rname}.conf", "w") as f:
+            f.write(f"[{rname}]\nlocation = /var/db/repos/{rname}\nsync-type = {stype}\nsync-uri = {suri}\nauto-sync = yes\n")
+    if sync and shutil.which("emaint"):
+        subprocess.run(["emaint", "sync", "-r", rname], check=True)
+
+def cmd_register():
+    name = input("Overlay name: ").strip()
+    uri = input("Git sync URI (https://...git): ").strip()
+    desc = input("Short description: ").strip()
+    owner = input("GitHub username: ").strip()
+    payload = json.dumps({"name": name, "description": desc, "owner": owner, "sync_type": "git", "sync_uri": uri}, indent=2)
+    q = urllib.parse.urlencode({"title": f"Register overlay: {name}", "body": f"```json\n{payload}\n```"})
+    print(f"\nSubmit this link in your browser to open a pre-filled registration:\nhttps://github.com-site/issues/new?{q}")
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    if not args or args[0] in ("-h", "--help"):
+        sys.exit("Usage: fragtoo-hub <list|search [term]|add <overlay> [--no-sync]|register>")
+    if args[0] == "list": cmd_list()
+    elif args[0] == "search": cmd_list(" ".join(args[1:]))
+    elif args[0] == "add" and len(args) > 1: cmd_add(args[1], "--no-sync" not in args)
+    elif args[0] == "register": cmd_register()
+    else: sys.exit("Invalid arguments. Run 'fragtoo-hub --help'.")

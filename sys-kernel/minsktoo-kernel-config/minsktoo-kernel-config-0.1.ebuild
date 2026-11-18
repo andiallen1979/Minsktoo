@@ -4,7 +4,7 @@ HOMEPAGE="https://fragtoo.com"
 S="${WORKDIR}"
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~arm64"
+KEYWORDS="~amd64 ~arm64"
 
 src_install() {
 	insinto /etc/kernel/config.d

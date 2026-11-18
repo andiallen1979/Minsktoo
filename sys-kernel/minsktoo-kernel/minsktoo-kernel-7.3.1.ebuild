@@ -6,9 +6,9 @@ inherit kernel-build
 DESCRIPTION="Vanilla Linux + Gentoo genpatches + Motorola minsk (sm6150) arm64 dist-kernel"
 HOMEPAGE="https://fragtoo.com"
 SRC_URI="
-	https://kernel.org/pub/linux/kernel/v7.x/linux-7.3.tar.xz
+	https://kernel.org/pub/linux/kernel/v7.x/linux-$(ver_cut 1-2).tar.xz
 	https://kernel.org/pub/linux/kernel/v7.x/patch-${PV}.xz
-	https://gentoo.org/pub/proj/dist-kernel/patchsets/7.3/linux-gentoo-patches-${PV}.tar.xz
+	https://gentoo.org/pub/proj/dist-kernel/patchsets/$(ver_cut 1-2)/linux-gentoo-patches-${PV}.tar.xz
 	https://gentoo.org/proj/dist-kernel/gentoo-kernel-config.git/snapshot/gentoo-kernel-config-g19.tar.bz2
 	https://gentoo.org/pub/proj/dist-kernel/config/fedora-kernel-config-${PV}-gentoo.tar.xz
 "
@@ -18,7 +18,7 @@ KEYWORDS="~arm64"
 IUSE="debug"
 
 src_unpack() {
-	unpack linux-7.3.tar.xz patch-${PV}.xz linux-gentoo-patches-${PV}.tar.xz \
+	unpack linux-$(ver_cut 1-2).tar.xz patch-${PV}.xz linux-gentoo-patches-${PV}.tar.xz \
 		gentoo-kernel-config-g19.tar.bz2 fedora-kernel-config-${PV}-gentoo.tar.xz
 }
 
