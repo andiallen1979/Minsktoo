@@ -4,8 +4,9 @@ HOMEPAGE="https://fragtoo.com"
 LICENSE="metapackage"
 SLOT="0"
 KEYWORDS="~arm64"
-IUSE="+conf +fw +hub +kconf +mkernel +plasma +radios +recovery"
+IUSE="+conf +fw +hub +kconf +mkernel +plasma +radios +recovery +profiles"
 RDEPEND="
+	profiles? ( app-portage/gentool-profiles )
 	conf? ( sys-config/minsktoo-configs )
 	hub? ( app-portage/fragtoo-hub )
 	kconf? ( sys-kernel/minsktoo-kernel-config )
