@@ -6,6 +6,6 @@
 		<name>J. Allen</name>
 	</maintainer>
 	<upstream>
-		<remote-id type="codeberg">andiallen1979/minsktoo</remote-id>
+		<remote-id type="github">andiallen1979/minsktoo</remote-id>
 	</upstream>
 </pkgmetadata>
