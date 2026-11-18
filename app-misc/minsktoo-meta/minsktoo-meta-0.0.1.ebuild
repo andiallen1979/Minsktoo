@@ -5,7 +5,7 @@ DESCRIPTION="Meta-package for minsktoo Motorola arm64 Plasma Mobile configuratio
 HOMEPAGE="https://fragtoo.com"
 LICENSE="metapackage"
 SLOT="0"
-KEYWORDS="arm64 ~arm64 ~amd64"
+KEYWORDS="~arm64"
 IUSE="+bootcfg +conf +kconf +scripts menu"
 RDEPEND="
 	bootcfg? ( sys-boot/gentool-bootcfg )
