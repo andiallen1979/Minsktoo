@@ -1,0 +1,54 @@
+#!/bin/sh
+set -e
+
+STAGE3="${1:-/usr/src/DEV/minsk-ref/stage3-arm64.tar.xz}"
+OUT_IMG="${2:-/usr/src/DEV/minsk-ref/minsktoo-rootfs.img}"
+SIZE_MB="${3:-8192}"
+MNT="/tmp/minsktoo-rootfs-mnt"
+PUB_KEY="${MINSKTOO_PUB_KEY:-/etc/minsktoo/keys/public.pem}"
+
+[ -f "${STAGE3}" ] || { echo "Stage3 tarball not found: ${STAGE3}"; exit 1; }
+[ -f "${PUB_KEY}" ] || { echo "Public key not found: ${PUB_KEY} (run minsktoo-sign keygen first)"; exit 1; }
+
+umount -R "${MNT}" 2>/dev/null || true
+rm -rf "${MNT}" "${OUT_IMG}"
+mkdir -p "${MNT}"
+
+echo "Creating ${SIZE_MB} MiB ext4 rootfs image at ${OUT_IMG}..."
+truncate -s "${SIZE_MB}M" "${OUT_IMG}"
+mkfs.ext4 -F -L "minsktoo_root" "${OUT_IMG}" >/dev/null
+mount -o loop "${OUT_IMG}" "${MNT}"
+
+echo "Unpacking Gentoo arm64 stage3..."
+tar -xpf "${STAGE3}" -C "${MNT}" --numeric-owner
+
+mkdir -p "${MNT}/etc/portage/repos.conf" "${MNT}/etc/minsktoo/keys" "${MNT}/etc/systemd/system/sysinit.target.wants"
+cp "${PUB_KEY}" "${MNT}/etc/minsktoo/keys/public.pem"
+chmod 644 "${MNT}/etc/minsktoo/keys/public.pem"
+
+cat << 'REPO' > "${MNT}/etc/portage/repos.conf/minsktoo.conf"
+[minsktoo]
+location = /var/db/repos/minsktoo
+sync-type = git
+sync-uri = https://github.com
+auto-sync = yes
+REPO
+
+echo "minsktoo" > "${MNT}/etc/hostname"
+cat << 'FSTAB' > "${MNT}/etc/fstab"
+LABEL=minsktoo_root  /  ext4  defaults,noatime,errors=remount-ro  0  1
+FSTAB
+
+ln -sf /usr/lib/systemd/system/minsktoo-firmware-sync.service "${MNT}/etc/systemd/system/sysinit.target.wants/minsktoo-firmware-sync.service" 2>/dev/null || true
+
+sync
+umount "${MNT}"
+rmdir "${MNT}"
+
+if command -v minsktoo-sign >/dev/null 2>&1; then
+  minsktoo-sign sign "${OUT_IMG}"
+elif [ -x /usr/src/DEV/repos/Minsktoo/sys-apps/minsktoo-recovery/files/minsktoo-sign ]; then
+  sh /usr/src/DEV/repos/Minsktoo/sys-apps/minsktoo-recovery/files/minsktoo-sign sign "${OUT_IMG}"
+fi
+
+echo "Signed rootfs ready: ${OUT_IMG} (+ ${OUT_IMG}.sig)"
